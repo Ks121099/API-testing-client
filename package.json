@@ -1,0 +1,20 @@
+{
+  "name": "posclone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "snowpack dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@popperjs/core": "^2.9.2",
+    "axios": "^0.21.1",
+    "bootstrap": "^5.0.2"
+  },
+  "devDependencies": {
+    "snowpack": "^3.8.3"
+  }
+}
