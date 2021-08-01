@@ -1,11 +1,13 @@
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios';
+import prettyBytes from 'pretty-bytes';
+
 
 const queryParamContainer=document.querySelector('[data-query-params]')
 const requestContainer=document.querySelector('[data-headers]')
 const keyValueTemplate=document.querySelector('[data-key-value-template]')
-
+const responseContainer=document.querySelector('[data-response-headers]')
 
 document.getElementById("data-add-query").addEventListener('click', function(){
     queryParamContainer.append(createKeyValuePair());
@@ -23,9 +25,16 @@ document.querySelector('[data-form]').addEventListener('submit', e=> {
         method: document.getElementById('data-method').value,
         params: keyValueToObject(queryParamContainer),
         headers: keyValueToObject(requestContainer)
-    }).then(function (response) {
-        console.log(response);
-      })
+    })
+    .catch(e=> e.response)
+    .then(function (response) {
+  //     document.getElementById('response').value=response.data.id;
+        document.getElementById('data-response-section').classList.remove('d-none')
+        document.getElementById('data-status').textContent=response.status;
+        document.getElementById('data-size').textContent=prettyBytes(JSON.stringify(response.data).length 
+        +JSON.stringify(response.headers).length) 
+         updateResponseHeaders(response.headers);
+    })
 })
 
 function keyValueToObject(container){
@@ -47,5 +56,21 @@ function createKeyValuePair(){
     return element;
 }
 
+function updateResponseHeaders(header)
+{
+    responseContainer.innerHTML= ""
+    Object.entries(header).forEach(function([key,value]){
+        const keyElement=document.createElement("div")
+        keyElement.innerHTML=key
+        responseContainer.append(keyElement)
+        const valueElement=document.createElement("div")
+        valueElement.textContent=value
+        responseContainer.append(valueElement)
+})
+}
 
-//https://jsonplaceholder.typicode.com/todos/1 for testing
+function endTime(response){
+ response.customData=response.customData || {}
+
+}
+//https://jsonplaceholder.typicode.com/todos/1 for
