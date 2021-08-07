@@ -2,12 +2,17 @@ import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios';
 import prettyBytes from 'pretty-bytes';
-
+import setEditor from './json-editor';
 
 const queryParamContainer=document.querySelector('[data-query-params]')
 const requestContainer=document.querySelector('[data-headers]')
 const keyValueTemplate=document.querySelector('[data-key-value-template]')
 const responseContainer=document.querySelector('[data-response-headers]')
+
+queryParamContainer.append(createKeyValuePair());
+queryParamContainer.append(createKeyValuePair());
+requestContainer.append(createKeyValuePair());
+requestContainer.append(createKeyValuePair());
 
 document.getElementById("data-add-query").addEventListener('click', function(){
     queryParamContainer.append(createKeyValuePair());
@@ -17,6 +22,31 @@ document.getElementById("data-add-headers-btn").addEventListener('click', functi
     requestContainer.append(createKeyValuePair());
 }) 
 
+const {reqEditor,updateResponseEditor}=setEditor()
+
+axios.interceptors.request.use( function(request){
+    request.customData=request.customData || {}
+    request.customData.startTime= new Date().getTime();
+    return request;
+})
+
+function updateTime(response){
+    response.customData=response.customData || {}
+    response.customData.time=new Date().getTime()- response.config.customData.startTime;
+    return response;
+}
+
+axios.interceptors.response.use(updateTime, function(e){
+    return Promise.reject(updateTime(e.response))
+})
+
+let data
+try{
+    data=JSON.parse(reqEditor.state.doc.toString() || null)
+}
+catch(e){
+    alert("JSON data is malformed")
+}
 //Form handling
 document.querySelector('[data-form]').addEventListener('submit', e=> {
     e.preventDefault()
@@ -24,15 +54,20 @@ document.querySelector('[data-form]').addEventListener('submit', e=> {
         url: document.getElementById('data-url').value,
         method: document.getElementById('data-method').value,
         params: keyValueToObject(queryParamContainer),
-        headers: keyValueToObject(requestContainer)
+        headers: keyValueToObject(requestContainer),
+        data,
     })
-    .catch(e=> e.response)
+    .catch(e=> e)
     .then(function (response) {
-  //     document.getElementById('response').value=response.data.id;
         document.getElementById('data-response-section').classList.remove('d-none')
+        //Response details
         document.getElementById('data-status').textContent=response.status;
+        document.getElementById('data-time').textContent=response.customData.time;
         document.getElementById('data-size').textContent=prettyBytes(JSON.stringify(response.data).length 
-        +JSON.stringify(response.headers).length) 
+         +JSON.stringify(response.headers).length) 
+        //Response Editor
+         updateResponseEditor(response.data)
+         //Response Headers
          updateResponseHeaders(response.headers);
     })
 })
@@ -69,8 +104,4 @@ function updateResponseHeaders(header)
 })
 }
 
-function endTime(response){
- response.customData=response.customData || {}
-
-}
 //https://jsonplaceholder.typicode.com/todos/1 for

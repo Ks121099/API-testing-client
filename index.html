@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Testing</title>
     <script src="script.js" type="module"></script>
+    <script src="json-editor.js" type="module"></script>
 </head>
 <body>
     <div class="p-4">
@@ -49,7 +50,7 @@
                 </div>
             
                 <div class="tab-pane fade" id="json-data" role="tabpanel" aria-labelledby="json-data-tab">
-                <div data-json-data class="overflow-auto" style="max-height: 200px;"></div>
+                <div data-json-request class="overflow-auto" style="max-height: 200px;"></div>
                 </div>
             </div>
     </form>
@@ -58,11 +59,11 @@
         <h3>Response</h3>
         <div class="d-flex my-2">
             <div class="me-3">
-               Time:<span id="data-time"></span> 
-            </div>
-            <div class="me-3">
                 Status: <span id="data-status"></span> 
              </div>
+            <div class="me-3">
+               Time: <span id="data-time"></span> ms 
+            </div>
              <div class="me-3">
                 Size: <span id="data-size"></span>                
             </div>
@@ -79,8 +80,8 @@
         </ul>
         <div class="tab-content p-3 border-top-0 border">
             <div class="tab-pane fade show active" id="body" role="tabpanel" aria-labelledby="body-tab">
-            <div id="data-json-response-body" class="overflow-auto" style="max-height:200px;">
-            </div>
+                <div data-json-response-body class="overflow-auto" style="max-height:200px;">
+                </div>
             </div>
             
             <div class="tab-pane fade" id="response-headers" role="tabpanel" aria-labelledby="response-headers-tab">
